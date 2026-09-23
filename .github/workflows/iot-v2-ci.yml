@@ -1,0 +1,31 @@
+name: IoT V2 CI
+
+on:
+  pull_request:
+    paths:
+      - 'iot_app.py'
+      - 'iot_db.py'
+      - 'anomaly.py'
+      - 'ai_incident.py'
+      - 'mqtt_ingest.py'
+      - 'simulator.py'
+      - 'load_test.py'
+      - 'requirements-v2.txt'
+      - 'tests/**'
+      - '.github/workflows/iot-v2-ci.yml'
+  push:
+    branches:
+      - feature/iot-operations-v2
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -r requirements-v2.txt
+      - name: Run tests
+        run: pytest -q
