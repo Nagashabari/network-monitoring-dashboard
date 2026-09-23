@@ -1,162 +1,93 @@
-# Small Business Network Monitor
+# Network Monitoring Dashboard
 
-A lightweight Python network-monitoring dashboard built with **Flask + SQLite + HTML/CSS/JavaScript**.
+A lightweight network-monitoring dashboard built with **Python, Flask, SQLite, HTML, CSS and JavaScript**.
 
-It is designed as a practical portfolio project that shows **networking, Python, dashboard development and troubleshooting** in one place.
+This project monitors configured devices and hosts and displays their network status through a simple web dashboard. It demonstrates **networking, Python backend development, database management, frontend development and troubleshooting** in one project.
 
-## What it checks
+## Features
 
-For every device or host you add, the app can show:
+- **Device Availability** — checks whether a configured host is reachable
+- **Latency Monitoring** — measures average ping response time in milliseconds
+- **Packet Loss Detection** — calculates the percentage of packets that are lost
+- **DNS Resolution** — resolves hostnames such as `google.com`
+- **TCP Port Check** — checks whether a configured TCP service port is reachable
+- **Recent Uptime** — displays the percentage of successful recent checks
+- **Performance History** — stores measurements in SQLite for later analysis
+- **Latency History Chart** — displays latency changes over time
+- **Packet Loss History Chart** — displays packet-loss changes over time
+- **Automatic Refresh** — rechecks configured targets every 30 seconds
+- **Alert Notifications** — displays notifications when a network problem is detected
 
-- **Availability** — whether the host replies to ping
-- **Latency** — average ping response time in milliseconds
-- **Packet loss** — percentage of ping packets that do not return
-- **DNS resolution** — the IP address returned for a hostname such as `google.com`
-- **TCP port status** — whether one configured service port accepts a connection
-- **Recent uptime** — percentage of successful checks from the latest stored measurements
-- **History** — measurements saved in SQLite for later analysis
-- **Latency over time chart** — a time-series view of response-time changes
-- **Packet loss over time chart** — a time-series view of reliability changes
+## Alert Notification System
 
-The dashboard automatically rechecks targets every 30 seconds while the page is open. Each completed check is saved to SQLite, then the selected target's latest measurements are redrawn in the two history charts.
+A custom alert notification feature was added to make network problems easier to identify.
 
-## Performance history charts
+The dashboard generates notifications based on the latest network measurements:
 
-The **Performance history** section lets you select any configured target and review up to the latest 60 stored checks.
+| Condition | Notification |
+|---|---|
+| Device is unreachable | 🔴 Device is OFFLINE |
+| Packet loss > 20% | 🟠 High Packet Loss |
+| Latency > 200 ms | 🟡 High Latency |
+| Normal network condition | 🟢 Network is Healthy |
 
-The latency chart shows:
+Notifications appear on the dashboard when a problem is detected.
 
-- latest latency
-- average latency across the displayed history
-- peak latency
-- response-time trend over time
+The notification system also avoids repeatedly showing the same alert during every automatic refresh.
 
-The packet-loss chart shows:
+## What the Dashboard Monitors
 
-- latest packet loss
-- average packet loss
-- peak packet loss
-- reliability trend on a fixed 0–100% scale
+For every configured device or host, the application can display:
 
-The charts are drawn with browser-native SVG and JavaScript, so no external charting library is required.
+- Online / Offline status
+- Average latency
+- Packet loss percentage
+- DNS resolution
+- TCP port connectivity
+- Recent uptime
+- Historical measurements
+- Latency trends
+- Packet-loss trends
+- Network alerts
 
-## Example use
+## Example Use
 
-A small office could add:
+A small office could monitor devices such as:
 
-| Device | Host | Optional port | What it tells you |
+| Device | Host | Optional Port | Purpose |
 |---|---|---:|---|
-| Router | `192.168.1.1` | — | Is the gateway reachable? |
-| NAS | `192.168.1.10` | `445` | Is the NAS online and is SMB reachable? |
-| Printer | `192.168.1.20` | `9100` | Is the printer online and is its print service reachable? |
-| Website | `google.com` | `443` | Do DNS, internet access and HTTPS connectivity work? |
+| Router | `192.168.1.1` | — | Check whether the gateway is reachable |
+| NAS | `192.168.1.10` | `445` | Check NAS availability and SMB connectivity |
+| Printer | `192.168.1.20` | `9100` | Check printer availability and print-service connectivity |
+| Website | `google.com` | `443` | Check DNS and HTTPS connectivity |
 
-> Local addresses such as `192.168.x.x` can only be checked when this app is running on a computer connected to that same network.
+> Local addresses such as `192.168.x.x` can only be monitored when the application is running on a computer connected to the same network.
 
-## How it works
+## How It Works
 
 ```text
 Browser Dashboard
        |
        v
-Flask Web App
+Flask Web Application
        |
-       +--> DNS lookup (Python socket)
-       +--> Ping test (system ping command)
-       +--> TCP port check (Python socket)
+       +--> DNS Lookup
+       |
+       +--> Ping Test
+       |
+       +--> TCP Port Check
+       |
+       +--> Alert Detection
        |
        v
 SQLite Database
        |
-       +--> targets
-       +--> measurement history
+       +--> Target Information
+       |
+       +--> Measurement History
        |
        v
 History API
        |
        v
-SVG time-series charts
-```
-
-## Run it on Windows / macOS / Linux
-
-```bash
-python -m venv .venv
-```
-
-Activate the environment:
-
-**Windows PowerShell**
-
-```powershell
-.venv\Scripts\Activate.ps1
-```
-
-**macOS / Linux**
-
-```bash
-source .venv/bin/activate
-```
-
-Install packages and start the dashboard:
-
-```bash
-pip install -r requirements.txt
-python app.py
-```
-
-Open:
-
-```text
-http://127.0.0.1:5000
-```
-
-The SQLite database is created automatically on first run.
-
-## Test it
-
-```bash
-pytest -q
-```
-
-## Project structure
-
-```text
-Network-Monitor-Dashboard/
-├── app.py              # Flask routes, live-status API and history API
-├── monitor.py          # ping, DNS and TCP checks
-├── db.py               # SQLite operations
-├── schema.sql          # database schema
-├── templates/
-│   └── index.html      # dashboard page and chart containers
-├── static/
-│   ├── app.js          # live refresh + SVG chart rendering
-│   └── style.css       # responsive UI and chart styling
-├── tests/
-│   └── test_app.py
-├── requirements.txt
-└── README.md
-```
-
-## What I learned / demonstrated
-
-- Python networking with `socket`
-- ICMP-style reachability testing through the operating system `ping` utility
-- TCP connectivity checks
-- DNS troubleshooting
-- Flask backend and JSON API development
-- SQLite data storage and time-series history retrieval
-- Frontend JavaScript for live dashboard updates
-- SVG time-series data visualisation without an external chart dependency
-- Turning raw network measurements into an interface useful for troubleshooting
-
-## Good next upgrades
-
-- Alert rules after repeated failures or high packet loss
-- Email/Slack notifications
-- SNMP monitoring for switches and routers
-- Cisco device metrics and interface status
-- Windows Server monitoring
-- Export measurements to CSV
-- Authentication for business use
-- Docker deployment
+Performance Charts
